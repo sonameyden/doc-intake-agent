@@ -1,0 +1,27 @@
+[project]
+name = "doc-intake-agent"
+version = "0.1.0"
+description = "Multi-agent document intake with Google ADK and Gemini: extract, validate against an ERP, route exceptions."
+requires-python = ">=3.10"
+dependencies = [
+  "google-adk",
+  "fastapi",
+  "uvicorn[standard]",
+  "httpx",
+  "pillow",
+  "reportlab",
+  "python-dotenv",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["docintake", "mock_erp"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

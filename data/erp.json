@@ -1,0 +1,400 @@
+{
+  "vendors": [
+    {
+      "id": "V001",
+      "name": "Druk Office Supplies",
+      "aliases": [
+        "Druk Office Supplies Pvt. Ltd."
+      ],
+      "currency": "BTN"
+    },
+    {
+      "id": "V002",
+      "name": "Thimphu Print House",
+      "aliases": [],
+      "currency": "BTN"
+    },
+    {
+      "id": "V003",
+      "name": "Paro Valley Catering",
+      "aliases": [
+        "Paro Valley Catering Services"
+      ],
+      "currency": "BTN"
+    },
+    {
+      "id": "V004",
+      "name": "Himalayan Tech Traders",
+      "aliases": [],
+      "currency": "INR"
+    },
+    {
+      "id": "V005",
+      "name": "Bumthang Hardware",
+      "aliases": [],
+      "currency": "BTN"
+    },
+    {
+      "id": "V006",
+      "name": "Kolkata Paper Mills",
+      "aliases": [
+        "Kolkata Paper Mills Ltd"
+      ],
+      "currency": "INR"
+    },
+    {
+      "id": "V007",
+      "name": "Phuentsholing Logistics",
+      "aliases": [],
+      "currency": "INR"
+    },
+    {
+      "id": "V008",
+      "name": "Summit Cloud Services",
+      "aliases": [
+        "Summit Cloud Services Inc."
+      ],
+      "currency": "USD"
+    }
+  ],
+  "purchase_orders": [
+    {
+      "po_number": "PO-4428",
+      "vendor_id": "V006",
+      "currency": "INR",
+      "amount": "12900.00",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-4560",
+      "vendor_id": "V003",
+      "currency": "BTN",
+      "amount": "21346.50",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-4294",
+      "vendor_id": "V003",
+      "currency": "BTN",
+      "amount": "32760.00",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-4713",
+      "vendor_id": "V006",
+      "currency": "INR",
+      "amount": "8767.50",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-4082",
+      "vendor_id": "V008",
+      "currency": "USD",
+      "amount": "394.80",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-4004",
+      "vendor_id": "V003",
+      "currency": "BTN",
+      "amount": "4578.00",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-4615",
+      "vendor_id": "V007",
+      "currency": "INR",
+      "amount": "26200.00",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-4767",
+      "vendor_id": "V006",
+      "currency": "INR",
+      "amount": "39750.00",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-4757",
+      "vendor_id": "V002",
+      "currency": "BTN",
+      "amount": "10710.00",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-4209",
+      "vendor_id": "V006",
+      "currency": "INR",
+      "amount": "22050.00",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-4926",
+      "vendor_id": "V006",
+      "currency": "INR",
+      "amount": "14300.00",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-4246",
+      "vendor_id": "V003",
+      "currency": "BTN",
+      "amount": "3633.00",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-4633",
+      "vendor_id": "V008",
+      "currency": "USD",
+      "amount": "64.00",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-4715",
+      "vendor_id": "V001",
+      "currency": "BTN",
+      "amount": "40649.73",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-4764",
+      "vendor_id": "V005",
+      "currency": "BTN",
+      "amount": "13356.00",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-4524",
+      "vendor_id": "V006",
+      "currency": "INR",
+      "amount": "39718.40",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-4709",
+      "vendor_id": "V003",
+      "currency": "BTN",
+      "amount": "3852.00",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-4285",
+      "vendor_id": "V006",
+      "currency": "INR",
+      "amount": "5000.00",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-4741",
+      "vendor_id": "V004",
+      "currency": "INR",
+      "amount": "19300.00",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-4766",
+      "vendor_id": "V002",
+      "currency": "BTN",
+      "amount": "20055.00",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-4636",
+      "vendor_id": "V008",
+      "currency": "USD",
+      "amount": "287.05",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-4991",
+      "vendor_id": "V008",
+      "currency": "USD",
+      "amount": "327.10",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-4415",
+      "vendor_id": "V005",
+      "currency": "BTN",
+      "amount": "6280.00",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-4392",
+      "vendor_id": "V002",
+      "currency": "BTN",
+      "amount": "14910.00",
+      "status": "closed"
+    },
+    {
+      "po_number": "PO-4033",
+      "vendor_id": "V004",
+      "currency": "INR",
+      "amount": "57300.00",
+      "status": "closed"
+    },
+    {
+      "po_number": "PO-4540",
+      "vendor_id": "V003",
+      "currency": "USD",
+      "amount": "31880.00",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-4056",
+      "vendor_id": "V008",
+      "currency": "BTN",
+      "amount": "476.15",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-4476",
+      "vendor_id": "V002",
+      "currency": "INR",
+      "amount": "40500.00",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-4337",
+      "vendor_id": "V003",
+      "currency": "BTN",
+      "amount": "16260.00",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-4089",
+      "vendor_id": "V001",
+      "currency": "BTN",
+      "amount": "28686.00",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-3000",
+      "vendor_id": "V001",
+      "currency": "BTN",
+      "amount": "19140.00",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-3001",
+      "vendor_id": "V002",
+      "currency": "BTN",
+      "amount": "7119.00",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-3002",
+      "vendor_id": "V006",
+      "currency": "INR",
+      "amount": "27124.00",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-3003",
+      "vendor_id": "V007",
+      "currency": "INR",
+      "amount": "15039.00",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-3004",
+      "vendor_id": "V004",
+      "currency": "INR",
+      "amount": "27628.00",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-3005",
+      "vendor_id": "V001",
+      "currency": "BTN",
+      "amount": "5512.00",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-3006",
+      "vendor_id": "V005",
+      "currency": "BTN",
+      "amount": "63536.00",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-3007",
+      "vendor_id": "V003",
+      "currency": "BTN",
+      "amount": "13826.00",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-3008",
+      "vendor_id": "V005",
+      "currency": "BTN",
+      "amount": "42830.00",
+      "status": "closed"
+    },
+    {
+      "po_number": "PO-3009",
+      "vendor_id": "V007",
+      "currency": "INR",
+      "amount": "35230.00",
+      "status": "open"
+    },
+    {
+      "po_number": "PO-3010",
+      "vendor_id": "V006",
+      "currency": "INR",
+      "amount": "34646.00",
+      "status": "closed"
+    },
+    {
+      "po_number": "PO-3011",
+      "vendor_id": "V001",
+      "currency": "BTN",
+      "amount": "49237.00",
+      "status": "closed"
+    }
+  ],
+  "payments": [
+    {
+      "invoice_number": "PVC-2026-0020",
+      "vendor_id": "V003",
+      "amount": "3852.00",
+      "currency": "BTN",
+      "paid_on": "2026-10-12"
+    },
+    {
+      "invoice_number": "KPM-2026-0021",
+      "vendor_id": "V006",
+      "amount": "5000.00",
+      "currency": "INR",
+      "paid_on": "2026-11-10"
+    },
+    {
+      "invoice_number": "HTT-2026-0022",
+      "vendor_id": "V004",
+      "amount": "19300.00",
+      "currency": "INR",
+      "paid_on": "2026-10-17"
+    },
+    {
+      "invoice_number": "TPH-2026-0023",
+      "vendor_id": "V002",
+      "amount": "20055.00",
+      "currency": "BTN",
+      "paid_on": "2026-09-19"
+    },
+    {
+      "invoice_number": "R68163",
+      "vendor_id": "V005",
+      "amount": "1764.00",
+      "currency": "BTN",
+      "paid_on": "2026-11-24"
+    },
+    {
+      "invoice_number": "R94881",
+      "vendor_id": "V002",
+      "amount": "963.00",
+      "currency": "BTN",
+      "paid_on": "2026-11-14"
+    }
+  ]
+}

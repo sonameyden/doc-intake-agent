@@ -1,0 +1,7 @@
+# Documents are binary: never convert their line endings.
+*.pdf binary
+*.png binary
+*.jpg binary
+
+# Text files: LF in the repository.
+* text=auto eol=lf
