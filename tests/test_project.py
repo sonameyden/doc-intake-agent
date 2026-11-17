@@ -204,3 +204,39 @@ def test_eval_can_select_files():
     assert [label["file"][:3] for label in load_labels(None, None, ["16,47,48"])] == expected
     with pytest.raises(SystemExit):
         load_labels(None, None, ["abc"])
+
+
+def test_eval_offset_selects_the_second_half():
+    from docintake.eval import load_labels
+
+    if not LABELS_FILE.exists():
+        pytest.skip("run: python -m docintake.generate")
+    second = load_labels(None, None, offset=30)
+    assert len(second) == 30 and second[0]["file"].startswith("031")
+    assert load_labels(30, None)[-1]["file"].startswith("030")
+
+
+def test_summary_merges_runs_with_the_later_run_winning(tmp_path, capsys, monkeypatch):
+    from docintake import summary
+
+    base = {"config": {"model": "m", "validator_context": "none"}, "format": "pdf", "hard": False, "scenario": "clean",
+            "expected": "auto_accept", "expected_reasons": [], "latency_s": 1.0, "tokens_in": 10, "tokens_out": 1}
+    from docintake.scoring import FIELDS
+
+    ok_score = {"fields": {name: True for name in FIELDS}, "all_fields": True, "decision_correct": True, "reasons_exact": True, "missed_reasons": [],
+                "extra_reasons": [], "false_accept": False, "false_review": False}
+    first = tmp_path / "a.jsonl"
+    second = tmp_path / "b.jsonl"
+    first.write_text(json.dumps({**base, "file": "001.pdf", "score": ok_score}) + "\n"
+                     + json.dumps({**base, "file": "002.pdf", "error": "429"}) + "\n", encoding="utf-8")
+    second.write_text(json.dumps({**base, "file": "002.pdf", "score": ok_score}) + "\n", encoding="utf-8")
+    monkeypatch.setattr(sys, "argv", ["summary", str(first), str(second)])
+    summary.main()
+    out = capsys.readouterr().out
+    assert "60 documents" not in out and "Decision correct | 2/2" in out and "Errors (no result) | 0" in out
+
+    mixed = tmp_path / "c.jsonl"
+    mixed.write_text(json.dumps({**base, "config": {"model": "other"}, "file": "003.pdf", "score": ok_score}) + "\n", encoding="utf-8")
+    monkeypatch.setattr(sys, "argv", ["summary", str(first), str(mixed)])
+    with pytest.raises(SystemExit):
+        summary.main()

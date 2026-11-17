@@ -6,6 +6,7 @@ import os
 from decimal import Decimal, InvalidOperation
 
 import httpx
+from google.adk.tools.tool_context import ToolContext
 
 ERP_URL = os.getenv("ERP_URL", "http://127.0.0.1:8001")
 _client = httpx.Client(base_url=ERP_URL, timeout=10.0)
@@ -23,27 +24,41 @@ def _get(path: str, params: dict | None = None) -> dict:
     return {"status": "ok", "data": response.json()}
 
 
-def find_vendor(name: str) -> dict:
+def _record(tool_context: ToolContext | None, key: str, value: dict) -> None:
+    """Keep what each ERP lookup returned in state["facts"], so the guardrail can check
+    the decision against the evidence rather than against the model's report of it."""
+    if tool_context is None:
+        return
+    facts = dict(tool_context.state.get("facts") or {})
+    facts[key] = value
+    tool_context.state["facts"] = facts  # reassign: nested changes are not tracked
+
+
+def find_vendor(name: str, tool_context: ToolContext | None = None) -> dict:
     """Search the ERP's vendor master by name. The search is loose: check that a hit is
     really the same company (its name or one of its aliases) before relying on it.
 
     Args:
         name: The vendor name as printed on the document.
     """
-    return _get("/vendors", {"name": name})
+    result = _get("/vendors", {"name": name})
+    _record(tool_context, "vendor", {"query": name, **result})
+    return result
 
 
-def get_purchase_order(po_number: str) -> dict:
+def get_purchase_order(po_number: str, tool_context: ToolContext | None = None) -> dict:
     """Look up a purchase order: its vendor_id, currency, approved amount and status
     ("open" or "closed").
 
     Args:
         po_number: The purchase order number printed on the invoice, e.g. "PO-4123".
     """
-    return _get(f"/purchase-orders/{po_number}")
+    result = _get(f"/purchase-orders/{po_number}")
+    _record(tool_context, "purchase_order", {"query": po_number, **result})
+    return result
 
 
-def find_payments(invoice_number: str, vendor_id: str) -> dict:
+def find_payments(invoice_number: str, vendor_id: str, tool_context: ToolContext | None = None) -> dict:
     """List payments already made for this invoice or receipt number to this vendor.
     Any hit means the document was already paid.
 
@@ -51,7 +66,9 @@ def find_payments(invoice_number: str, vendor_id: str) -> dict:
         invoice_number: The invoice or receipt number printed on the document.
         vendor_id: The vendor's id from find_vendor, e.g. "V003".
     """
-    return _get("/payments", {"invoice_number": invoice_number, "vendor_id": vendor_id})
+    result = _get("/payments", {"invoice_number": invoice_number, "vendor_id": vendor_id})
+    _record(tool_context, "payments", {"query": {"invoice_number": invoice_number, "vendor_id": vendor_id}, **result})
+    return result
 
 
 def check_totals(subtotal: float, tax: float, total: float) -> dict:

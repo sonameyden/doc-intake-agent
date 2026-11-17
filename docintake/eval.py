@@ -2,6 +2,7 @@
 
     python -m docintake.eval                  # every document
     python -m docintake.eval --limit 10       # first 10
+    python -m docintake.eval --offset 30      # all but the first 30
     python -m docintake.eval --only photo     # by format: pdf, scan or photo
     python -m docintake.eval --dry-run        # no model: checks the scoring itself
 
@@ -46,13 +47,14 @@ def _wanted_numbers(files: str | list[str]) -> set[int]:
     return numbers
 
 
-def load_labels(limit: int | None, only: str | None, files: str | list[str] | None = None) -> list[dict]:
+def load_labels(limit: int | None, only: str | None, files: str | list[str] | None = None, offset: int = 0) -> list[dict]:
     labels = [json.loads(line) for line in LABELS_FILE.read_text(encoding="utf-8").splitlines() if line.strip()]
     if files:
         wanted = _wanted_numbers(files)
         labels = [label for label in labels if int(label["file"].split("_", 1)[0]) in wanted]
     if only:
         labels = [label for label in labels if only in (label["format"], label["scenario"], label["fields"]["document_type"])]
+    labels = labels[offset:]
     return labels[:limit] if limit else labels
 
 
@@ -91,6 +93,8 @@ async def run_one(runner, label: dict) -> dict:
         "extracted": _as_dict(state.get("extracted")),
         "validation": state.get("validation"),
         "decision": _as_dict(state.get("decision")),
+        "decision_llm": _as_dict(state.get("decision_llm")),
+        "guardrail": state.get("guardrail"),
         "latency_s": round(latency, 2),
         "tokens_in": tokens_in,
         "tokens_out": tokens_out,
@@ -146,7 +150,9 @@ def summarise(rows: list[dict]) -> str:
     pct = lambda k: 100 * k / n if n else 0.0  # noqa: E731
     price_in = float(os.getenv("PRICE_INPUT_PER_M", "0") or 0)
     price_out = float(os.getenv("PRICE_OUTPUT_PER_M", "0") or 0)
-    lines = [f"# Eval run: {n} documents", ""]
+    config = rows[0].get("config", {}) if rows else {}
+    settings = ", ".join(f"{k}={v}" for k, v in config.items())
+    lines = [f"# Eval run: {n} documents", "", f"Settings: {settings}", ""] if settings else [f"# Eval run: {n} documents", ""]
     lines += ["| Metric | Value |", "| --- | --- |"]
     lines.append(f"| All fields correct | {sum(r['score']['all_fields'] for r in done)}/{n} ({pct(sum(r['score']['all_fields'] for r in done)):.1f}%) |")
     lines.append(f"| Decision correct | {sum(r['score']['decision_correct'] for r in done)}/{n} ({pct(sum(r['score']['decision_correct'] for r in done)):.1f}%) |")
@@ -154,6 +160,11 @@ def summarise(rows: list[dict]) -> str:
     lines.append(f"| **False accepts** (needed a person, auto-accepted) | {sum(r['score']['false_accept'] for r in done)} |")
     lines.append(f"| False reviews (fine, sent to a person) | {sum(r['score']['false_review'] for r in done)} |")
     lines.append(f"| Errors (no result) | {n - len(done)} |")
+    llm = [r for r in done if "score_llm" in r]
+    if llm:
+        lines.append(f"| Reviewer alone: decisions correct | {sum(r['score_llm']['decision_correct'] for r in llm)}/{len(llm)} |")
+        lines.append(f"| Reviewer alone: false accepts | {sum(r['score_llm']['false_accept'] for r in llm)} |")
+        lines.append(f"| Guardrail overrode an accept | {sum(bool((r.get('guardrail') or {}).get('overrode_accept')) for r in llm)} |")
     if done and any(r["latency_s"] for r in done):
         latencies = sorted(r["latency_s"] for r in done)
         lines.append(f"| Latency median / p90 | {statistics.median(latencies):.1f} s / {latencies[int(0.9 * (len(latencies) - 1))]:.1f} s |")
@@ -187,6 +198,7 @@ def summarise(rows: list[dict]) -> str:
 async def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--limit", type=int)
+    parser.add_argument("--offset", type=int, default=0, help="skip the first N documents (e.g. --offset 30 for the second half)")
     parser.add_argument("--only", help="pdf, scan, photo, invoice, receipt or a scenario name")
     parser.add_argument("--files", nargs="+", help='document numbers, e.g. "016,047,048" or 16 47 48')
     parser.add_argument("--dry-run", action="store_true", help="no model; score the rules' own answers")
@@ -199,7 +211,7 @@ async def main() -> None:
         logging.getLogger("google_adk").setLevel(logging.CRITICAL)
 
     load_dotenv(find_dotenv(usecwd=True))
-    labels = load_labels(args.limit, args.only, args.files)
+    labels = load_labels(args.limit, args.only, args.files, args.offset)
     if not labels:
         raise SystemExit("No documents match --files/--only. Example: --files \"016,047,048\" or --only photo")
     erp = json.loads(ERP_FILE.read_text(encoding="utf-8"))
@@ -213,6 +225,10 @@ async def main() -> None:
 
         runner = InMemoryRunner(agent=root_agent, app_name=APP)
 
+    config = {"mode": "dry-run"} if args.dry_run else {
+        "model": os.getenv("MODEL", "gemini-3.5-flash-lite"),
+        "validator_context": os.getenv("VALIDATOR_CONTEXT", "none"),
+    }
     stamp = datetime.now().strftime("%Y%m%d-%H%M%S") + ("-dry" if args.dry_run else "")
     out_dir = ROOT / "results"
     out_dir.mkdir(exist_ok=True)
@@ -220,10 +236,12 @@ async def main() -> None:
     with (out_dir / f"run-{stamp}.jsonl").open("w", encoding="utf-8") as out:
         for i, label in enumerate(labels, 1):
             result = dry_run_one(label, erp) if args.dry_run else await run_with_retry(runner, label)
-            row = {"file": label["file"], "format": label["format"], "hard": label["hard"],
+            row = {"config": config, "file": label["file"], "format": label["format"], "hard": label["hard"],
                    "scenario": label["scenario"], "expected": label["decision"], "expected_reasons": label["reasons"], **result}
             if "error" not in row:
                 row["score"] = score(label, row["extracted"], row["decision"])
+                if row.get("decision_llm"):
+                    row["score_llm"] = score(label, row["extracted"], row["decision_llm"])
                 mark = "ok " if row["score"]["decision_correct"] and row["score"]["all_fields"] else "BAD"
                 print(f"[{i}/{len(labels)}] {mark} {label['file']} -> {(row['decision'] or {}).get('decision')} ({row['latency_s']} s)")
             else:
